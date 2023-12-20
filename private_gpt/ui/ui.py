@@ -18,7 +18,6 @@ from private_gpt.server.chat.chat_service import ChatService, CompletionGen
 from private_gpt.server.chunks.chunks_service import Chunk, ChunksService
 from private_gpt.server.ingest.ingest_service import IngestService
 from private_gpt.settings.settings import settings
-import language_tool_python
 # from private_gpt.ui.images import logo_svg
 
 logger = logging.getLogger(__name__)
@@ -79,7 +78,8 @@ class PrivateGptUi:
         self.mode = MODES[0]
         self._system_prompt = self._get_default_system_prompt(self.mode)
 
-    def _chat(self, message: str, history: list[list[str]], mode: str, grammar_checkbox: bool, *_: Any) -> Any:
+    def _chat(self, message: str, history: list[list[str]], mode: str, grammar_checkbox: bool, summarize_checkbox: bool, *_: Any) -> Any:
+        
         def grammar_correction(input_text: str) -> str:
             corrected_text = "Improve the grammar of the following sentence(s):\n" + input_text
             return corrected_text
@@ -88,6 +88,15 @@ class PrivateGptUi:
             if grammar_checkbox:
                 return grammar_correction(message)
             return message
+        
+        def apply_summarize_correction(input_text: str, summarization_option: str) -> str:
+            if summarization_option == "Small Summary":
+                return "generate short length: " + input_text
+            elif summarization_option == "Medium Summary":
+                return "generate medium length: " + input_text
+            elif summarization_option == "Large Summary":
+                return "generate large length: " + input_text
+            return input_text
         
         def yield_deltas(completion_gen: CompletionGen) -> Iterable[str]:
             full_response: str = ""
@@ -134,6 +143,13 @@ class PrivateGptUi:
         if grammar_checkbox:
             new_message.content = grammar_correction(new_message.content)
         all_messages = [*build_history(), new_message]
+
+        corrected_message = apply_summarize_correction(message, summarize_checkbox)
+        new_message = ChatMessage(content=corrected_message, role=MessageRole.USER)
+        if summarize_checkbox != "No Summary":
+            new_message.content = apply_summarize_correction(new_message.content, summarize_checkbox)
+        all_messages = [*build_history(), new_message]
+
         # If a system prompt is set, add it as a system message
         if self._system_prompt:
             all_messages.insert(
@@ -292,6 +308,15 @@ class PrivateGptUi:
                     grammar_checkbox = gr.Checkbox(
                         label="Enable Grammar Correction"
                     )
+                     # Add a checkbox for summarize correction
+                    show_summarization_options = gr.update(render=mode == MODES[2])
+                    summarize_options = ["Small Summary", "Medium Summary", "Large Summary"]
+                    summarize_radio = gr.Radio(
+                        summarize_options,
+                        label="Summarization",
+                        value="No Summary",
+                        render=show_summarization_options,
+                    )
 
                 with gr.Column(scale=7, elem_id="col"):
                     _ = gr.ChatInterface(
@@ -306,7 +331,7 @@ class PrivateGptUi:
                                 AVATAR_BOT,
                             ),
                         ),
-                        additional_inputs=[mode, upload_button, system_prompt_input, grammar_checkbox],
+                        additional_inputs=[mode, upload_button, system_prompt_input, grammar_checkbox, summarize_radio],
                     )
         return blocks
 
