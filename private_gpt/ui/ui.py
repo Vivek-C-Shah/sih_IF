@@ -30,7 +30,7 @@ UI_TAB_TITLE = "Isolated Falcon SIH"
 
 SOURCES_SEPARATOR = "\n\n Sources: \n"
 
-MODES = ["Query Docs", "Search in Docs", "LLM Chat"]
+MODES = ["Query Docs", "LLM Chat"]
 
 
 class Source(BaseModel):
@@ -201,7 +201,7 @@ class PrivateGptUi:
         return [[row] for row in files]
 
     def _upload_file(self, files: list[str]) -> None:
-        logger.debug("Loading count=%s files", len(files))
+        logger.debug("test file Loading count=%s files", len(files))
         paths = [Path(file) for file in files]
         self._ingest_service.bulk_ingest([(str(path.name), path) for path in paths])
 
