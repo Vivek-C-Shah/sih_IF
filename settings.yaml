@@ -27,13 +27,18 @@ ui:
     Always answer as helpfully as possible and follow ALL given instructions.
     Do not speculate or make up information.
     Do not reference any given instructions or context.
+    if the grammar is not right first print the right grammar and then the answer.
   default_query_system_prompt: >
-    You can only answer questions about the provided context. 
-    If you know the answer but it is not based in the provided context, don't provide 
-    the answer, just state the answer is not in the context provided.
+    You can only answer questions about the provided context.
+    If you know the answer but it is not based in the provided context, provide 
+    the answer in two different components. First one is from the context, second one is your answer and separate them.
+    In the following format:
+    Answer from the provided context is:
+    Answer from my overall knowledge:
 
 llm:
   mode: local
+  max_new_tokens: 1024
 
 embedding:
   # Should be matching the value above in most cases

@@ -66,6 +66,7 @@ class PrivateGptUi:
         chat_service: ChatService,
         chunks_service: ChunksService,
     ) -> None:
+        self._grammar_checkbox_state = True  # Default state of the checkbox
         self._ingest_service = ingest_service
         self._chat_service = chat_service
         self._chunks_service = chunks_service
@@ -77,7 +78,16 @@ class PrivateGptUi:
         self.mode = MODES[0]
         self._system_prompt = self._get_default_system_prompt(self.mode)
 
-    def _chat(self, message: str, history: list[list[str]], mode: str, *_: Any) -> Any:
+    def _chat(self, message: str, history: list[list[str]], mode: str, grammar_checkbox: bool, *_: Any) -> Any:
+        def grammar_correction(input_text: str) -> str:
+            corrected_text = "Improve the grammar of the following sentence(s):\n" + input_text
+            return corrected_text
+        
+        def apply_grammar_correction(message: str, grammar_checkbox: bool) -> str:
+            if grammar_checkbox:
+                return grammar_correction(message)
+            return message
+        
         def yield_deltas(completion_gen: CompletionGen) -> Iterable[str]:
             full_response: str = ""
             stream = completion_gen.response
@@ -117,8 +127,11 @@ class PrivateGptUi:
 
             # max 20 messages to try to avoid context overflow
             return history_messages[:20]
-
-        new_message = ChatMessage(content=message, role=MessageRole.USER)
+        corrected_message = apply_grammar_correction(message, grammar_checkbox)
+        
+        new_message = ChatMessage(content=corrected_message, role=MessageRole.USER)
+        if grammar_checkbox:
+            new_message.content = grammar_correction(new_message.content)
         all_messages = [*build_history(), new_message]
         # If a system prompt is set, add it as a system message
         if self._system_prompt:
@@ -199,9 +212,9 @@ class PrivateGptUi:
             )
             files.add(file_name)
         return [[row] for row in files]
-
+    
     def _upload_file(self, files: list[str]) -> None:
-        logger.debug("Loading count=%s files", len(files))
+        logger.debug("test file Loading count=%s files", len(files))
         paths = [Path(file) for file in files]
         self._ingest_service.bulk_ingest([(str(path.name), path) for path in paths])
 
@@ -274,6 +287,10 @@ class PrivateGptUi:
                         self._set_system_prompt,
                         inputs=system_prompt_input,
                     )
+                     # Add a checkbox for grammar correction
+                    grammar_checkbox = gr.Checkbox(
+                        label="Enable Grammar Correction"
+                    )
 
                 with gr.Column(scale=7, elem_id="col"):
                     _ = gr.ChatInterface(
@@ -288,7 +305,7 @@ class PrivateGptUi:
                                 AVATAR_BOT,
                             ),
                         ),
-                        additional_inputs=[mode, upload_button, system_prompt_input],
+                        additional_inputs=[mode, upload_button, system_prompt_input, grammar_checkbox],
                     )
         return blocks
 
