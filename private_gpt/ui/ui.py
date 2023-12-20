@@ -30,7 +30,7 @@ UI_TAB_TITLE = "Isolated Falcon SIH"
 
 SOURCES_SEPARATOR = "\n\n Sources: \n"
 
-MODES = ["Query Docs", "LLM Chat"]
+MODES = ["Query Docs", "Search in Docs", "LLM Chat"]
 
 
 class Source(BaseModel):
@@ -212,7 +212,7 @@ class PrivateGptUi:
             )
             files.add(file_name)
         return [[row] for row in files]
-
+    
     def _upload_file(self, files: list[str]) -> None:
         logger.debug("test file Loading count=%s files", len(files))
         paths = [Path(file) for file in files]

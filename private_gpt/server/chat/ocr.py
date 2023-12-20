@@ -22,3 +22,8 @@ for detection in result:
 print("test: ")
 
 print(result_string)
+
+# add this result_string to a text file
+with open('text.txt', 'w') as f:
+    f.write(result_string)
+
