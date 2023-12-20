@@ -18,7 +18,6 @@ from private_gpt.server.chat.chat_service import ChatService, CompletionGen
 from private_gpt.server.chunks.chunks_service import Chunk, ChunksService
 from private_gpt.server.ingest.ingest_service import IngestService
 from private_gpt.settings.settings import settings
-import language_tool_python
 # from private_gpt.ui.images import logo_svg
 
 logger = logging.getLogger(__name__)

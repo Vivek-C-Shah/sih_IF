@@ -5,7 +5,7 @@ import numpy as np
 import os
 
 UPLOADS_FOLDER = 'uploads/'
-IMAGE_FILENAME = 'test.jpg'
+IMAGE_FILENAME = 'test.png'
 IMAGE_PATH = os.path.join(UPLOADS_FOLDER, IMAGE_FILENAME)
 
 reader = easyocr.Reader(['en'])
