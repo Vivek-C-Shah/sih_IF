@@ -18,7 +18,7 @@ from private_gpt.server.chat.chat_service import ChatService, CompletionGen
 from private_gpt.server.chunks.chunks_service import Chunk, ChunksService
 from private_gpt.server.ingest.ingest_service import IngestService
 from private_gpt.settings.settings import settings
-from private_gpt.ui.images import logo_svg
+# from private_gpt.ui.images import logo_svg
 
 logger = logging.getLogger(__name__)
 
@@ -226,7 +226,7 @@ class PrivateGptUi:
             "#col { height: calc(100vh - 112px - 16px) !important; }",
         ) as blocks:
             with gr.Row():
-                gr.HTML(f"<div class='logo'/><img src={logo_svg} alt=PrivateGPT></div")
+                gr.HTML("<h1 style='text-align: center;'>Isolated Falcons SIH</h1>")
 
             with gr.Row(equal_height=False):
                 with gr.Column(scale=3):
