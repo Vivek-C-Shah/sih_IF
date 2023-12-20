@@ -81,7 +81,7 @@ class PrivateGptUi:
     def _chat(self, message: str, history: list[list[str]], mode: str, grammar_checkbox: bool, summarize_checkbox: bool, *_: Any) -> Any:
         
         def grammar_correction(input_text: str) -> str:
-            corrected_text = "Improve the grammar of the following sentence(s):\n" + input_text
+            corrected_text = "Fix the grammar of the following sentence(s):\n" + input_text
             return corrected_text
         
         def apply_grammar_correction(message: str, grammar_checkbox: bool) -> str:
